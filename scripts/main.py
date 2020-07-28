@@ -11,11 +11,15 @@ from torchreid.utils import (
     resume_from_checkpoint, load_pretrained_weights, compute_model_complexity
 )
 
-from default_config import (
+# from default_config import (
+#     imagedata_kwargs, optimizer_kwargs, videodata_kwargs, engine_run_kwargs,
+#     get_default_config, lr_scheduler_kwargs
+# )
+
+from test_config import (
     imagedata_kwargs, optimizer_kwargs, videodata_kwargs, engine_run_kwargs,
     get_default_config, lr_scheduler_kwargs
 )
-
 
 def build_datamanager(cfg):
     if cfg.data.type == 'image':
@@ -177,6 +181,7 @@ def main():
         'Building {}-engine for {}-reid'.format(cfg.loss.name, cfg.data.type)
     )
     engine = build_engine(cfg, datamanager, model, optimizer, scheduler)
+    print (engine_run_kwargs(cfg))
     engine.run(**engine_run_kwargs(cfg))
 
 

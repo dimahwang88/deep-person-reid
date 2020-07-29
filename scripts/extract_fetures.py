@@ -8,12 +8,6 @@ import cv2
 
 from PIL import Image
 
-extractor = FeatureExtractor(
-    model_name='resnet50_fc512',
-    model_path='/home/dmitriy.khvan/deep-person-reid/resnet50_fc512_market_xent.pth.tar',
-    device='cuda'
-)
-
 def test_sanity():
     features = extractor('/home/dmitriy.khvan/deep-person-reid/tmp/debug/dbg_orig_0.jpg')
     print(features)
@@ -23,7 +17,7 @@ def extract_image_patch(image, bbox):
     patch = image[y:y+h, x:x+w]
     return patch
 
-def resnet50_feed(image, boxes, model):
+def network_feed(image, boxes, extractor):
     features_out = []
 
     for num, box in enumerate(boxes):
@@ -42,6 +36,7 @@ def resnet50_feed(image, boxes, model):
         features = torch.flatten(features)
         features_np = features.cpu().detach().numpy()
 
+        print (features_np)
         features_out.append(features_np)
 
     features_out = np.asarray(features_out)
@@ -61,6 +56,13 @@ def generate_detections(ckpt_path, mot_dir, output_dir, detection_dir=None):
         else:
             raise ValueError(
                 "Failed to created output directory '%s'" % output_dir)
+
+    extractor = FeatureExtractor(
+        # model_name='resnet50_fc512',
+        model_name='osnet_x1_0',
+        model_path=ckpt_path,
+        device='cuda'
+    )
 
     for sequence in os.listdir(mot_dir):
         print("Processing %s" % sequence)
@@ -93,7 +95,7 @@ def generate_detections(ckpt_path, mot_dir, output_dir, detection_dir=None):
         
             bgr_image = cv2.imread(image_filenames[frame_idx], cv2.IMREAD_COLOR)
 
-            features = resnet50_feed(bgr_image, rows[:, 2:6].copy(), None)
+            features = network_feed(bgr_image, rows[:, 2:6].copy(), extractor)
             detections_out += [np.r_[(row, feature)] for row, feature in zip(rows, features)]
 
         np.save(output_filename, np.asarray(detections_out), allow_pickle=False)
@@ -102,4 +104,4 @@ def generate_detections(ckpt_path, mot_dir, output_dir, detection_dir=None):
 
 if __name__=="__main__": 
     if sys.argv[1] == 'extract':
-        generate_detections(sys.argv[2], '/home/dmitriy.khvan/dsort-gcp/bepro-data/data/', '/home/dmitriy.khvan/dsort-gcp/bepro-data/out')
+        generate_detections(sys.argv[2], sys.argv[3], sys.argv[4])

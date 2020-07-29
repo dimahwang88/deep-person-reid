@@ -7,10 +7,10 @@ def get_default_config():
     # model
     cfg.model = CN()
     # cfg.model.name = 'resnet50'
-    cfg.model.name = 'resnet50_fc512'
+    cfg.model.name = 'osnet_x1_0'
     cfg.model.pretrained = True # automatically load pretrained model weights if available
     # cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth' # path to model weights
-    cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/resnet50_fc512_market_xent.pth.tar' # path to model weights
+    cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth' # path to model weights
     cfg.model.resume = '' # path to checkpoint for resume training
 
     # data

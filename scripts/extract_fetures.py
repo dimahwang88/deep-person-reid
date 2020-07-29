@@ -36,7 +36,6 @@ def network_feed(image, boxes, extractor):
         features = torch.flatten(features)
         features_np = features.cpu().detach().numpy()
 
-        print (features_np)
         features_out.append(features_np)
 
     features_out = np.asarray(features_out)

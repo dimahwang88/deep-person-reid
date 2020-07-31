@@ -6,7 +6,6 @@ def get_default_config():
 
     # model
     cfg.model = CN()
-    # cfg.model.name = 'resnet50'
     cfg.model.name = 'osnet_x1_0'
     cfg.model.pretrained = True # automatically load pretrained model weights if available
     # cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth' # path to model weights
@@ -23,8 +22,10 @@ def get_default_config():
     cfg.data.targets = ['bepro']
     cfg.data.workers = 4 # number of data loading workers
     cfg.data.split_id = 0 # split index
-    cfg.data.height = 256 # image height
-    cfg.data.width = 128 # image width
+    # cfg.data.height = 256 # image height
+    # cfg.data.width = 128 # image width
+    cfg.data.height = 128 # image height
+    cfg.data.width = 64 # image width
     cfg.data.combineall = False # combine train, query and gallery for training
     cfg.data.transforms = ['random_flip'] # data augmentation
     cfg.data.k_tfm = 1 # number of times to apply augmentation to an image independently
@@ -199,11 +200,11 @@ def engine_run_kwargs(cfg):
         'start_eval': cfg.test.start_eval,
         'eval_freq': cfg.test.eval_freq,
         # 'test_only': cfg.test.evaluate,
-        'test_only': True,
+        'test_only': False,
         'print_freq': cfg.train.print_freq,
         'dist_metric': 'cosine',
         'normalize_feature': cfg.test.normalize_feature,
-        'visrank': True,
+        'visrank': False,
         'visrank_topk': cfg.test.visrank_topk,
         'use_metric_cuhk03': cfg.cuhk03.use_metric_cuhk03,
         'ranks': cfg.test.ranks,

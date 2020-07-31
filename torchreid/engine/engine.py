@@ -196,6 +196,9 @@ class Engine(object):
                 open_layers=open_layers
             )
 
+            print ("saving checkpoint to: " + save_dir)
+            self.save_model(self.epoch, 0.5, save_dir)
+
             if (self.epoch + 1) >= start_eval \
                and eval_freq > 0 \
                and (self.epoch+1) % eval_freq == 0 \
@@ -210,6 +213,7 @@ class Engine(object):
                     use_metric_cuhk03=use_metric_cuhk03,
                     ranks=ranks
                 )
+                print ("saving checkpoint to: " + save_dir)
                 self.save_model(self.epoch, rank1, save_dir)
                 self.writer.add_scalar('Test/rank1', rank1, self.epoch)
 

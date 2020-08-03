@@ -8,16 +8,19 @@ def get_default_config():
     cfg.model = CN()
     cfg.model.name = 'osnet_x1_0'
     cfg.model.pretrained = True # automatically load pretrained model weights if available
-    # cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth' # path to model weights
-    cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/osnet_x1_0_market_256x128_amsgrad_ep150_stp60_lr0.0015_b64_fb10_softmax_labelsmooth_flip.pth' # path to model weights
+    cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/log/model_market_100/model.pth.tar-100' # path to model weights
+    # cfg.model.resume = '/home/dmitriy.khvan/deep-person-reid/log/model_market_100/model.pth.tar-100' # path to checkpoint for resume training
     cfg.model.resume = '' # path to checkpoint for resume training
 
     # data
     cfg.data = CN()
     cfg.data.type = 'image'
     cfg.data.root = 'reid-data'
+    
     # cfg.data.sources = ['market1501']
     # cfg.data.targets = ['market1501']
+    # cfg.data.sources = ['msmt17']
+    # cfg.data.targets = ['msmt17']
     cfg.data.sources = ['bepro']
     cfg.data.targets = ['bepro']
     cfg.data.workers = 4 # number of data loading workers
@@ -57,9 +60,9 @@ def get_default_config():
     # train
     cfg.train = CN()
     cfg.train.optim = 'adam'
-    cfg.train.lr = 0.0003
+    cfg.train.lr = 0.0001
     cfg.train.weight_decay = 5e-4
-    cfg.train.max_epoch = 60
+    cfg.train.max_epoch = 100
     cfg.train.start_epoch = 0
     cfg.train.batch_size = 32
     cfg.train.fixbase_epoch = 0 # number of epochs to fix base layers
@@ -72,7 +75,7 @@ def get_default_config():
     cfg.train.lr_scheduler = 'single_step'
     cfg.train.stepsize = [20] # stepsize to decay learning rate
     cfg.train.gamma = 0.1 # learning rate decay multiplier
-    cfg.train.print_freq = 20 # print frequency
+    cfg.train.print_freq = 60 # print frequency
     cfg.train.seed = 1 # random seed
 
     # optimizer
@@ -103,8 +106,8 @@ def get_default_config():
     cfg.test.normalize_feature = False # normalize feature vectors before computing distance
     cfg.test.ranks = [1, 5, 10, 20] # cmc ranks
     cfg.test.evaluate = True # test only
-    cfg.test.eval_freq = -1 # evaluation frequency (-1 means to only test after training)
-    cfg.test.start_eval = 0 # start to evaluate after a specific epoch
+    cfg.test.eval_freq = 4 # evaluation frequency (-1 means to only test after training)
+    cfg.test.start_eval = 1 # start to evaluate after a specific epoch
     cfg.test.rerank = False # use person re-ranking
     cfg.test.visrank = False # visualize ranked results (only available when cfg.test.evaluate=True)
     cfg.test.visrank_topk = 10 # top-k ranks to visualize
@@ -200,11 +203,11 @@ def engine_run_kwargs(cfg):
         'start_eval': cfg.test.start_eval,
         'eval_freq': cfg.test.eval_freq,
         # 'test_only': cfg.test.evaluate,
-        'test_only': False,
+        'test_only': True,
         'print_freq': cfg.train.print_freq,
         'dist_metric': 'cosine',
         'normalize_feature': cfg.test.normalize_feature,
-        'visrank': False,
+        'visrank': True,
         'visrank_topk': cfg.test.visrank_topk,
         'use_metric_cuhk03': cfg.cuhk03.use_metric_cuhk03,
         'ranks': cfg.test.ranks,

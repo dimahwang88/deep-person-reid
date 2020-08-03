@@ -16,7 +16,12 @@ from torchreid.utils import (
 #     get_default_config, lr_scheduler_kwargs
 # )
 
-from test_config import (
+# from test_config import (
+#     imagedata_kwargs, optimizer_kwargs, videodata_kwargs, engine_run_kwargs,
+#     get_default_config, lr_scheduler_kwargs
+# )
+
+from cuhk03_config import (
     imagedata_kwargs, optimizer_kwargs, videodata_kwargs, engine_run_kwargs,
     get_default_config, lr_scheduler_kwargs
 )

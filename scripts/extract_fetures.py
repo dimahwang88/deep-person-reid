@@ -102,5 +102,4 @@ def generate_detections(ckpt_path, mot_dir, output_dir, detection_dir=None):
 
 
 if __name__=="__main__": 
-    if sys.argv[1] == 'extract':
-        generate_detections(sys.argv[2], sys.argv[3], sys.argv[4])
+    generate_detections(sys.argv[1], sys.argv[2], sys.argv[3])

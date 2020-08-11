@@ -7,8 +7,9 @@ def get_default_config():
     # model
     cfg.model = CN()
     cfg.model.name = 'osnet_x1_0'
-    cfg.model.pretrained = True # automatically load pretrained model weights if available
-    cfg.model.load_weights = '/home/dmitriy.khvan/deep-person-reid/log/model_market_cuhk03_100/model.pth.tar-100' # path to model weights
+    # cfg.model.pretrained = True # automatically load pretrained model weights if available
+    cfg.model.pretrained = False # automatically load pretrained model weights if available
+    cfg.model.load_weights = '' # path to model weights
     cfg.model.resume = '' # path to checkpoint for resume training
 
     # data
@@ -16,17 +17,14 @@ def get_default_config():
     cfg.data.type = 'image'
     cfg.data.root = 'reid-data'
     
-    cfg.data.sources = ['cuhk03', 'market1501']
+    cfg.data.sources = ['market1501', 'cuhk03']
     cfg.data.targets = ['bepro']
 
     cfg.data.workers = 4 # number of data loading workers
     cfg.data.split_id = 0 # split index
-    # cfg.data.height = 256 # image height
-    # cfg.data.width = 128 # image width
     cfg.data.height = 128 # image height
     cfg.data.width = 64 # image width
-    # cfg.data.combineall = False # combine train, query and gallery for training
-    cfg.data.combineall = True # combine train, query and gallery for training
+    cfg.data.combineall = False # combine train, query and gallery for training
     cfg.data.transforms = ['random_flip'] # data augmentation
     cfg.data.k_tfm = 1 # number of times to apply augmentation to an image independently
     cfg.data.norm_mean = [0.485, 0.456, 0.406] # default is imagenet mean
@@ -57,7 +55,7 @@ def get_default_config():
     # train
     cfg.train = CN()
     cfg.train.optim = 'adam'
-    cfg.train.lr = 0.0001
+    cfg.train.lr = 0.0002
     cfg.train.weight_decay = 5e-4
     cfg.train.max_epoch = 100
     cfg.train.start_epoch = 0
@@ -200,11 +198,11 @@ def engine_run_kwargs(cfg):
         'start_eval': cfg.test.start_eval,
         'eval_freq': cfg.test.eval_freq,
         # 'test_only': cfg.test.evaluate,
-        'test_only': True,
+        'test_only': False,
         'print_freq': cfg.train.print_freq,
         'dist_metric': 'cosine',
         'normalize_feature': cfg.test.normalize_feature,
-        'visrank': True,
+        'visrank': False,
         'visrank_topk': cfg.test.visrank_topk,
         'use_metric_cuhk03': cfg.cuhk03.use_metric_cuhk03,
         'ranks': cfg.test.ranks,

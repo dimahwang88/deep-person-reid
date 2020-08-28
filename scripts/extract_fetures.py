@@ -19,6 +19,7 @@ def extract_image_patch(image, bbox):
 
 def network_feed(image, boxes, extractor):
     features_out = []
+    patches_np_lst = []
 
     for num, box in enumerate(boxes):
         patch = extract_image_patch(image, box)
@@ -30,18 +31,19 @@ def network_feed(image, boxes, extractor):
             patch_rgb = np.random.uniform(0., 255., image_shape).astype(np.uint8)
 
         patch_np = np.array(patch_rgb)
-        features = extractor(patch_np)
-        # print (type(features), features.size())
+        patches_np_lst.append(patch_np)
 
-        features = torch.flatten(features)
-        features_np = features.cpu().detach().numpy()
+    features = extractor(patches_np_lst)
+    # print (type(features), features.size())
 
-        features_out.append(features_np)
+    # features = torch.flatten(features)
+    features_np = features.cpu().detach().numpy()
+    # print(type(features_np), features_np.shape)
 
-    features_out = np.asarray(features_out)
+    # features_out = np.asarray(features_out)
     # print(type(features_out), features_out.shape)
     
-    return features_out
+    return features_np
 
 def generate_detections(ckpt_path, mot_dir, output_dir, detection_dir=None):
 
@@ -102,4 +104,5 @@ def generate_detections(ckpt_path, mot_dir, output_dir, detection_dir=None):
 
 
 if __name__=="__main__": 
+    # python scripts/extract_fetures.py checkpoints/market_cuhk_prid_88e.pth ~/dsort-gcp/bepro-data/data/ ~/dsort-gcp/bepro-data/out/
     generate_detections(sys.argv[1], sys.argv[2], sys.argv[3])

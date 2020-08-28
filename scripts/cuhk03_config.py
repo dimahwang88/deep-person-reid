@@ -6,6 +6,7 @@ def get_default_config():
 
     # model
     cfg.model = CN()
+    # cfg.model.name = 'resnet50_fc512'
     cfg.model.name = 'osnet_x1_0'
     cfg.model.pretrained = True # automatically load pretrained model weights if available
     cfg.model.load_weights = '' # path to model weights
@@ -16,14 +17,15 @@ def get_default_config():
     cfg.data.type = 'image'
     cfg.data.root = 'reid-data'
     
-    cfg.data.sources = ['market1501', 'cuhk03', 'prid']
+    cfg.data.sources = ['market1501']
     cfg.data.targets = ['bepro']
 
     cfg.data.workers = 4 # number of data loading workers
     cfg.data.split_id = 0 # split index
     cfg.data.height = 128 # image height
     cfg.data.width = 64 # image width
-    cfg.data.combineall = False # combine train, query and gallery for training
+    # cfg.data.combineall = False # combine train, query and gallery for training
+    cfg.data.combineall = True # combine train, query and gallery for training
     cfg.data.transforms = ['random_flip'] # data augmentation
     cfg.data.k_tfm = 1 # number of times to apply augmentation to an image independently
     cfg.data.norm_mean = [0.485, 0.456, 0.406] # default is imagenet mean
@@ -54,9 +56,9 @@ def get_default_config():
     # train
     cfg.train = CN()
     cfg.train.optim = 'adam'
-    cfg.train.lr = 0.0002
+    cfg.train.lr = 0.0001
     cfg.train.weight_decay = 5e-4
-    cfg.train.max_epoch = 100
+    cfg.train.max_epoch = 120
     cfg.train.start_epoch = 0
     cfg.train.batch_size = 32
     cfg.train.fixbase_epoch = 0 # number of epochs to fix base layers
@@ -100,7 +102,7 @@ def get_default_config():
     cfg.test.normalize_feature = False # normalize feature vectors before computing distance
     cfg.test.ranks = [1, 5, 10, 20] # cmc ranks
     cfg.test.evaluate = True # test only
-    cfg.test.eval_freq = 4 # evaluation frequency (-1 means to only test after training)
+    cfg.test.eval_freq = 10 # evaluation frequency (-1 means to only test after training)
     cfg.test.start_eval = 1 # start to evaluate after a specific epoch
     cfg.test.rerank = False # use person re-ranking
     cfg.test.visrank = False # visualize ranked results (only available when cfg.test.evaluate=True)

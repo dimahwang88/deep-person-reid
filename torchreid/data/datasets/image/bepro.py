@@ -28,9 +28,9 @@ class BeproTest(ImageDataset):
         #         '"Market-1501-v15.09.15".'
         #     )
 
-        self.train_dir = osp.join(self.data_dir, 'bounding_box_train')
-        self.query_dir = osp.join(self.data_dir, 'query')
-        self.gallery_dir = osp.join(self.data_dir, 'test')
+        self.train_dir = osp.join(self.data_dir, 'bepro_train')
+        self.query_dir = osp.join(self.data_dir, 'bepro_query')
+        self.gallery_dir = osp.join(self.data_dir, 'bepro_test')
         # self.extra_gallery_dir = osp.join(self.data_dir, 'images')
         # self.market1501_500k = market1501_500k
 

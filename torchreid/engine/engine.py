@@ -22,9 +22,6 @@ class Engine(object):
     Args:
         datamanager (DataManager): an instance of ``torchreid.data.ImageDataManager``
             or ``torchreid.data.VideoDataManager``.
-        model (nn.Module): model instance.
-        optimizer (Optimizer): an Optimizer.
-        scheduler (LRScheduler, optional): if None, no learning rate decay will be performed.
         use_gpu (bool, optional): use gpu. Default is True.
     """
 
@@ -34,6 +31,7 @@ class Engine(object):
         self.test_loader = self.datamanager.test_loader
         self.use_gpu = (torch.cuda.is_available() and use_gpu)
         self.writer = None
+        self.epoch = 0
 
         self.model = None
         self.optimizer = None
@@ -169,7 +167,6 @@ class Engine(object):
 
         if test_only:
             self.test(
-                0,
                 dist_metric=dist_metric,
                 normalize_feature=normalize_feature,
                 visrank=visrank,
@@ -204,7 +201,6 @@ class Engine(object):
                and (self.epoch+1) % eval_freq == 0 \
                and (self.epoch + 1) != self.max_epoch:
                 rank1 = self.test(
-                    self.epoch,
                     dist_metric=dist_metric,
                     normalize_feature=normalize_feature,
                     visrank=visrank,
@@ -215,12 +211,10 @@ class Engine(object):
                 )
                 print ("saving checkpoint to: " + save_dir)
                 self.save_model(self.epoch, rank1, save_dir)
-                self.writer.add_scalar('Test/rank1', rank1, self.epoch)
 
         if self.max_epoch > 0:
             print('=> Final test')
             rank1 = self.test(
-                self.epoch,
                 dist_metric=dist_metric,
                 normalize_feature=normalize_feature,
                 visrank=visrank,
@@ -230,7 +224,6 @@ class Engine(object):
                 ranks=ranks
             )
             self.save_model(self.epoch, rank1, save_dir)
-            self.writer.add_scalar('Test/rank1', rank1, self.epoch)
 
         elapsed = round(time.time() - time_start)
         elapsed = str(datetime.timedelta(seconds=elapsed))
@@ -302,7 +295,6 @@ class Engine(object):
 
     def test(
         self,
-        epoch,
         dist_metric='euclidean',
         normalize_feature=False,
         visrank=False,
@@ -333,8 +325,7 @@ class Engine(object):
             print('##### Evaluating {} ({}) #####'.format(name, domain))
             query_loader = self.test_loader[name]['query']
             gallery_loader = self.test_loader[name]['gallery']
-            rank1 = self._evaluate(
-                epoch,
+            rank1, mAP = self._evaluate(
                 dataset_name=name,
                 query_loader=query_loader,
                 gallery_loader=gallery_loader,
@@ -348,12 +339,15 @@ class Engine(object):
                 rerank=rerank
             )
 
+            if self.writer is not None:
+                self.writer.add_scalar(f'Test/{name}/rank1', rank1, self.epoch)
+                self.writer.add_scalar(f'Test/{name}/mAP', mAP, self.epoch)
+
         return rank1
 
     @torch.no_grad()
     def _evaluate(
         self,
-        epoch,
         dataset_name='',
         query_loader=None,
         gallery_loader=None,
@@ -377,7 +371,7 @@ class Engine(object):
                 end = time.time()
                 features = self.extract_features(imgs)
                 batch_time.update(time.time() - end)
-                features = features.data.cpu()
+                features = features.cpu().clone()
                 f_.append(features)
                 pids_.extend(pids)
                 camids_.extend(camids)
@@ -440,7 +434,7 @@ class Engine(object):
                 topk=visrank_topk
             )
 
-        return cmc[0]
+        return cmc[0], mAP
 
     def compute_loss(self, criterion, outputs, targets):
         if isinstance(outputs, (tuple, list)):
